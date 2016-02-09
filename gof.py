@@ -57,9 +57,9 @@ def walk_tree():
 def find_empty_folders():
     for root, dirs, files in os.walk(start_dir):
         if os.path.split(root)[1] == "Video_Annotation":
-            print "root: {}".format(root)
-            print "dirs: {}".format(dirs)
-            print "files: {}".format(files)
+            # print "root: {}".format(root)
+            # print "dirs: {}".format(dirs)
+            # print "files: {}".format(files)
 
             if len(files) == 0:
                 empty_vid_anot_folders.append(root)
@@ -70,8 +70,20 @@ def find_empty_folders():
                 single_opf_in_dir.append(opf_files[0])
 
             if len(opf_files) > 1:
-                if any("consensus" in x for x in opf_files):
+                consensus = False
+                final = False
+                consensus_files = []
+                for file in opf_files:
+                    if "consensus" in file and "final" not in file:
+                        consensus = True
+                        consensus_files.append(file)
+                    if "final" in file:
+                        final = True
 
+                if not final and consensus:
+                    if len(consensus_files) > 1:
+                        print "there were a bunch of consensus files: {}".format(consensus_files)
+                    nofinal_but_consensus.append(consensus_files[0])
 
     with open("empty_vid_annot_dirs", "wb") as file:
         for dir in empty_vid_anot_folders:
@@ -81,6 +93,10 @@ def find_empty_folders():
     with open("single_opf_in_dir", "wb") as output:
         for dir in single_opf_nofinal:
             output.write(dir+"\n")
+
+    with open("nofinal_but_consensus", "wb") as consensus:
+        for entry in nofinal_but_consensus:
+            consensus.write(entry+"\n")
 
 def fill_pidictionary_with_nofile():
     subj_prefix = ""
@@ -174,10 +190,10 @@ def array_to_prefix(array):
         return '18'
 
 def list_of_all_files():
-    return os.listdir("data/opf_files") + os.listdir("data/single_opf_nofinal")
+    return os.listdir("data/opf_files") + os.listdir("data/single_opf_nofinal") + os.listdir("data/nofinal_but_consensus")
 
 def list_of_pinfo_files():
-    return os.listdir("data/pinfo_files") + os.listdir("data/single_opf_nofinal/personal_info_files")
+    return os.listdir("data/pinfo_files") + os.listdir("data/single_opf_nofinal/personal_info_files") + os.listdir("data/nofinal_but_consensus/personal_info_files")
 
 def generate_nopersonalinfo_files():
 
@@ -218,10 +234,10 @@ def empty_folders_to_list():
     print subj_visit
 
 if __name__ == "__main__":
-    #start_dir = sys.argv[1]
-    #init_personalinfo_dictionary()
-    #fill_pidictionary_with_nofile()
-    #generate_nopersonalinfo_files()
+    start_dir = sys.argv[1]
+    init_personalinfo_dictionary()
+    fill_pidictionary_with_nofile()
+    generate_nopersonalinfo_files()
     # output_no_files()
     #find_empty_folders()
-    empty_folders_to_list()
+    #empty_folders_to_list()
