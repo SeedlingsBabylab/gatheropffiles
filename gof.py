@@ -42,12 +42,13 @@ def init_personalinfo_dictionary():
     for i in range(47):
         personal_dictionary.append(["no-pi"]*13)
 
+
 def walk_tree():
     for root, dirs, files in os.walk(start_dir):
         if os.path.split(root)[1] == "Video_Annotation":
-            print "root: {}".format(root)
-            print "dirs: {}".format(dirs)
-            print "files: {}".format(files)
+            #print "root: {}".format(root)
+            #print "dirs: {}".format(dirs)
+            #print "files: {}".format(files)
 
             for file in files:
                 if "_final.opf" in file:
@@ -98,6 +99,7 @@ def find_empty_folders():
         for entry in nofinal_but_consensus:
             consensus.write(entry+"\n")
 
+
 def fill_pidictionary_with_nofile():
     subj_prefix = ""
     visit_prefix = ""
@@ -125,6 +127,7 @@ def fill_pidictionary_with_nofile():
                 nofile_count += 1
 
     print "\n\nnofile_count: {}".format(nofile_count)
+
 
 def check_if_file_exists(prefix):
     for file in list_of_all_files():
@@ -161,6 +164,7 @@ def prefix_to_array(prefix):
     elif prefix == '18':
         return 12
 
+
 def array_to_prefix(array):
     if array == 0:
         return '06'
@@ -189,11 +193,14 @@ def array_to_prefix(array):
     elif array == 12:
         return '18'
 
+
 def list_of_all_files():
-    return os.listdir("data/opf_files") + os.listdir("data/single_opf_nofinal") + os.listdir("data/nofinal_but_consensus")
+    return os.listdir("data/opf_files") #+ os.listdir("data/single_opf_nofinal") + os.listdir("data/nofinal_but_consensus")
+
 
 def list_of_pinfo_files():
-    return os.listdir("data/pinfo_files") + os.listdir("data/single_opf_nofinal/personal_info_files") + os.listdir("data/nofinal_but_consensus/personal_info_files")
+    return os.listdir("data/pinfo_files") #+ os.listdir("data/single_opf_nofinal/personal_info_files") + os.listdir("data/nofinal_but_consensus/personal_info_files")
+
 
 def generate_nopersonalinfo_files():
 
@@ -214,6 +221,7 @@ def generate_nopersonalinfo_files():
         for index, subject in enumerate(personal_dictionary[1:]):
             writer.writerow([index+1] + subject)
 
+
 def output_no_files():
 
     without_18 = [x for x in no_files if x[3:] != '18']
@@ -221,6 +229,7 @@ def output_no_files():
         for entry in without_18:
             file.write(entry+"\n")
     print "without_18 count: {}".format(len(without_18))
+
 
 def empty_folders_to_list():
     paths = []
@@ -235,9 +244,15 @@ def empty_folders_to_list():
 
 if __name__ == "__main__":
     start_dir = sys.argv[1]
-    init_personalinfo_dictionary()
-    fill_pidictionary_with_nofile()
-    generate_nopersonalinfo_files()
+    final_directory = sys.argv[2]
+
+    walk_tree()
+
+    # init_personalinfo_dictionary()
+    # fill_pidictionary_with_nofile()
+    # generate_nopersonalinfo_files()
+
+
     # output_no_files()
-    #find_empty_folders()
-    #empty_folders_to_list()
+    # find_empty_folders()
+    # empty_folders_to_list()
