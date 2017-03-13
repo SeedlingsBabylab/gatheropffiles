@@ -5,7 +5,7 @@ import os
 import csv
 
 start_dir = ""
-final_directory = "/Users/andrei/code/work/babylab/opffiles"
+final_directory = ""
 
 
 empty_vid_anot_folders = []
@@ -15,44 +15,21 @@ nofinal_but_consensus = []
 no_files = []
 
 
-single_opf_nofinal=["01_14_coderVL.opf",
-                    "01_13_coderSK.opf",
-                    "19_11_coderJH.opf",
-                    "31_07_coderVL.opf",
-                    "17_09_coderEB.opf",
-                    "28_07_coderAR.opf",
-                    "11_10_coderEB.opf",
-                    "27_06_coderJH.opf",
-                    "32_06_coderJH.opf",
-                    "04_10_coderAS.opf",
-                    "04_09_coderSM.opf",
-                    "26_06_coderAS.opf",
-                    "26_07_coderEB.opf",
-                    "26_09_coderEB.opf",
-                    "29_07_coderEB.opf",
-                    "29_12_coderSD.opf",
-                    "42_07_coderSK.opf",
-                    "43_07_coderTE.opf",
-                    "15_12_coderLN.opf",
-                    "07_11_CoderSM.opf"]
-
-
-personal_dictionary = []
-def init_personalinfo_dictionary():
-    for i in range(47):
-        personal_dictionary.append(["no-pi"]*13)
-
-
-def walk_tree():
+def walk_tree(month=None):
     for root, dirs, files in os.walk(start_dir):
         if os.path.split(root)[1] == "Video_Annotation":
-            #print "root: {}".format(root)
-            #print "dirs: {}".format(dirs)
-            #print "files: {}".format(files)
-
             for file in files:
                 if "_final.opf" in file:
-                    copy(os.path.join(root, file), final_directory)
+                    if month:
+                        if right_month(file, month):
+                            copy(os.path.join(root, file), final_directory)
+                    else:
+                        copy(os.path.join(root, file), final_directory)
+
+def right_month(file, month):
+    if file[3:5] == month:
+        return True
+    return False
 
 
 def find_empty_folders():
@@ -100,128 +77,6 @@ def find_empty_folders():
             consensus.write(entry+"\n")
 
 
-def fill_pidictionary_with_nofile():
-    subj_prefix = ""
-    visit_prefix = ""
-
-    nofile_count = 0
-    all_files = list_of_all_files()
-    for i, subject in enumerate(personal_dictionary[1:]):
-        #print "i: {}".format(i)
-        for j, visit in enumerate(subject):
-            if i <9:
-                subj_prefix = '0'+str(i+1)
-            else:
-                subj_prefix = str(i+1)
-
-            visit_prefix = str(array_to_prefix(j))
-
-            prefix = subj_prefix+"_"+visit_prefix
-
-
-            if not any(prefix in x for x in all_files):
-                #print "prefix: {}".format(prefix)
-                #print "no file"
-                no_files.append(prefix)
-                personal_dictionary[i+1][j] = "NO-FILE"
-                nofile_count += 1
-
-    print "\n\nnofile_count: {}".format(nofile_count)
-
-
-def check_if_file_exists(prefix):
-    for file in list_of_all_files():
-        if prefix in file:
-            return True
-    return False
-
-
-def prefix_to_array(prefix):
-    if prefix == '06':
-        return 0
-    elif prefix == '07':
-        return 1
-    elif prefix == '08':
-        return 2
-    elif prefix == '09':
-        return 3
-    elif prefix == '10':
-        return 4
-    elif prefix == '11':
-        return 5
-    elif prefix == '12':
-        return 6
-    elif prefix == '13':
-        return 7
-    elif prefix == '14':
-        return 8
-    elif prefix == '15':
-        return 9
-    elif prefix == '16':
-        return 10
-    elif prefix == '17':
-        return 11
-    elif prefix == '18':
-        return 12
-
-
-def array_to_prefix(array):
-    if array == 0:
-        return '06'
-    elif array == 1:
-        return '07'
-    elif array == 2:
-        return '08'
-    elif array == 3:
-        return '09'
-    elif array == 4:
-        return '10'
-    elif array == 5:
-        return '11'
-    elif array == 6:
-        return '12'
-    elif array == 7:
-        return '13'
-    elif array == 8:
-        return '14'
-    elif array == 9:
-        return '15'
-    elif array == 10:
-        return '16'
-    elif array == 11:
-        return '17'
-    elif array == 12:
-        return '18'
-
-
-def list_of_all_files():
-    return os.listdir("data/opf_files") #+ os.listdir("data/single_opf_nofinal") + os.listdir("data/nofinal_but_consensus")
-
-
-def list_of_pinfo_files():
-    return os.listdir("data/pinfo_files") #+ os.listdir("data/single_opf_nofinal/personal_info_files") + os.listdir("data/nofinal_but_consensus/personal_info_files")
-
-
-def generate_nopersonalinfo_files():
-
-    pinfo_files = list_of_pinfo_files()
-    for file in set(pinfo_files):
-        if ".DS" in file:
-            continue
-        prefix = file[0:5].split("_")
-        #print "original: {}".format(prefix)
-        prefix = [int(prefix[0]), prefix_to_array(prefix[1])]
-        #print "new: {}".format(prefix)
-
-        personal_dictionary[prefix[0]][prefix[1]] = "**PI**"
-    with open("opf_personalinfo_table.csv", "wb") as table:
-        writer = csv.writer(table)
-        writer.writerow(["subject-visit", "06", "07", "08", "09", "10",
-                         "11", "12", "13", "14", "15", "16", "17", "18"])
-        for index, subject in enumerate(personal_dictionary[1:]):
-            writer.writerow([index+1] + subject)
-
-
 def output_no_files():
 
     without_18 = [x for x in no_files if x[3:] != '18']
@@ -246,11 +101,11 @@ if __name__ == "__main__":
     start_dir = sys.argv[1]
     final_directory = sys.argv[2]
 
-    walk_tree()
-
-    # init_personalinfo_dictionary()
-    # fill_pidictionary_with_nofile()
-    # generate_nopersonalinfo_files()
+    if len(sys.argv) > 3:
+        month = sys.argv[3]
+        walk_tree(month)
+    else:
+        walk_tree()
 
 
     # output_no_files()
