@@ -3,3 +3,6 @@ data/pinfo_files
 data/single_opf_nofinal
 data/nofinal_but_consensus
 .idea
+output
+.ropeproject
+opf_files
